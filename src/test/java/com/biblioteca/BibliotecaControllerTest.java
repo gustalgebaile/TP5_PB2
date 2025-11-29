@@ -21,7 +21,7 @@ public class BibliotecaControllerTest {
         controller = new BibliotecaController();
     }
     @Provide
-    Arbitrary<Book> validClients(){
+    Arbitrary<Book> validBooks(){
         Arbitrary<String> names = Arbitraries.strings()
                 .withCharRange('a','z')
                 .ofMinLength(3)
@@ -36,7 +36,7 @@ public class BibliotecaControllerTest {
     }
 
     @Provide
-    Arbitrary<Book> invalidClients() {
+    Arbitrary<Book> invalidBooks() {
         Arbitrary<String> names = Arbitraries.of("", null);
         Arbitrary<String> emails = Arbitraries.of("", null);
         return Combinators.combine(names, emails).as(Book::new);
@@ -51,7 +51,7 @@ public class BibliotecaControllerTest {
     };
 
     @Provide
-    Arbitrary<String> validEmails() {
+    Arbitrary<String> validAutors() {
         return Arbitraries.strings()
                 .withCharRange('a','z')
                 .ofMinLength(3)
@@ -64,7 +64,7 @@ public class BibliotecaControllerTest {
     };
 
     @Provide
-    Arbitrary<String> invalidEmails() {
+    Arbitrary<String> invalidAutors() {
         return Arbitraries.strings()
                 .withCharRange('a','z')
                 .ofMinLength(3)
@@ -94,7 +94,7 @@ public class BibliotecaControllerTest {
     }
 
     @Example
-    void updateBookWithValidData(@ForAll("validNames") String name,@ForAll("validAutor") String autor,@ForAll("mockedBookIds") int id){
+    void updateBookWithValidData(@ForAll("validNames") String name,@ForAll("validAutors") String autor,@ForAll("mockedBookIds") int id){
         assertDoesNotThrow(() -> {
             controller.updateBook(new Book(id,name,autor));
         });
