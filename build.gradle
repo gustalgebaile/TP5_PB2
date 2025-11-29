@@ -58,7 +58,7 @@ shadowJar {
 
     manifest {
         attributes(
-                'Main-Class': 'org.example.app.App'
+                'Main-Class': 'org.example.app.BibliotecaWebApplication'
         )
     }
 }
