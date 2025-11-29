@@ -1,0 +1,40 @@
+name: CI/CD Pós-deploy.yml
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Dar permissão ao Gradlew
+        run: chmod +x gradlew
+
+      - name: Install Chrome
+        run: |
+          sudo apt update
+          sudo apt install -y google-chrome-stable
+
+      - name: Build and Test
+        run: ./gradlew clean build --no-daemon
+
+      - name: Resumo Build e Test
+        if: always()
+        run: |
+          echo "## Resumo Build e Teste" >> $GITHUB_STEP_SUMMARY
+          echo "- Status do Job: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Testes executados: $(./gradlew test --dry-run | grep "Executing" || echo 'Não disponível')" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefatos disponíveis: build/libs/" >> $GITHUB_STEP_SUMMARY
