@@ -32,7 +32,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'com.Biblioteca.app.BibliotecaWebApplication'
+    mainClass = 'com.biblioteca.app.BibliotecaWebApplication'
 }
 
 test {
@@ -58,7 +58,7 @@ shadowJar {
 
     manifest {
         attributes(
-                'Main-Class': 'org.example.app.BibliotecaWebApplication'
+                'Main-Class': 'com.biblioteca.app.BibliotecaWebApplication'
         )
     }
 }
