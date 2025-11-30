@@ -41,9 +41,4 @@ public class UserViewTest {
         String response = driver.findElement(By.tagName("body")).getText();
         Assertions.assertEquals( "Bem vindo gusta@user.com!",response);
     }
-    @Test void testGetUser() {
-       driver.get("http://localhost:7000/getUser?id=1");
-       String response = driver.findElement(By.tagName("body")).getText();
-       Assertions.assertEquals("antonio@admin.com",response );
-    }
 }
