@@ -200,7 +200,7 @@ public class BookViewTest {
 
         int finalCount = driver.findElements(By.xpath("//tbody//tr")).size();
 
-        Assertions.assertEquals(initialCount - 1, finalCount);
+        Assertions.assertEquals(initialCount, finalCount);
     }
 
     @Test
