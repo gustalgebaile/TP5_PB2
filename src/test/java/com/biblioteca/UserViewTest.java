@@ -32,18 +32,18 @@ public class UserViewTest {
         app.stop();
     }
     @Test void testHelloAdmin() {
-        driver.get("http://localhost:7000/hello?user=alice@admin.com");
+        driver.get("http://localhost:7000/hello?user=antonio@admin.com");
         String response = driver.findElement(By.tagName("body")).getText();
-        Assertions.assertEquals("Bem vindo admin alice@admin.com! Chave:123456",response);
+        Assertions.assertEquals("Bem vindo admin antonio@admin.com! Chave:123456",response);
     }
     @Test void testHelloUser() {
-        driver.get("http://localhost:7000/hello?user=bob@user.com");
+        driver.get("http://localhost:7000/hello?user=gusta@user.com");
         String response = driver.findElement(By.tagName("body")).getText();
-        Assertions.assertEquals( "Bem vindo bob@user.com!",response);
+        Assertions.assertEquals( "Bem vindo gusta@user.com!",response);
     }
     @Test void testGetUser() {
        driver.get("http://localhost:7000/getUser?id=1");
        String response = driver.findElement(By.tagName("body")).getText();
-       Assertions.assertEquals("alice@admin.com",response );
+       Assertions.assertEquals("antonio@admin.com",response );
     }
 }
