@@ -34,7 +34,7 @@ public class UserViewTest {
     @Test void testHelloAdmin() {
         driver.get("http://localhost:7000/hello?user=antonio@admin.com");
         String response = driver.findElement(By.tagName("body")).getText();
-        Assertions.assertEquals("Bem vindo admin antonio@admin.com! Chave:123456",response);
+        Assertions.assertEquals("Bem vindo administrador antonio@admin.com! Chave:123456",response);
     }
     @Test void testHelloUser() {
         driver.get("http://localhost:7000/hello?user=gusta@user.com");
