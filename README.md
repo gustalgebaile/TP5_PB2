@@ -1,37 +1,37 @@
 # TP5 do Projeto de Bloco — Aplicação Web Java com Javalin e Pipelines CI/CD
 
-[![CI/CD Pós-deploy.yml](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/ci.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/ci.yml)
-[![CodeQL Analysis](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/codeql.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/codeql.yml)
-[![DAST Scan](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/dast.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/dast.yml)
-[![Pipeline Java com ambientes](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/deploy.yml/badge.svg)](https://github.com/AugustoCedro/tp5-bloco/actions/workflows/deploy.yml)
+[![Workflow CI/CD](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/gradle-ci.yml)
+[![CodeQL Analysis](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/codeQL.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/codeQL.yml)
+[![DAST Scan](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/dastScan.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/dastScan.yml)
+[![Pipeline Java](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/deployTests.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/deployTests.yml)
 
 ---
 
-## 🎯 Visão Geral
+## Visão Geral
 
-Repositório desenvolvido para o **TP5_PB2** que implementa uma aplicação web completa em **Java 21** utilizando **Javalin 6** como framework leve. O projeto gerencia uma biblioteca digital com CRUD completo, incluindo interface Bootstrap, testes automatizados abrangentes (>90% cobertura Jacoco) e pipelines GitHub Actions para CI/CD com aprovação manual em produção.
+Repositório desenvolvido para o **TP5_PB** que implementa uma aplicação web completa em **Java 21** utilizando **Javalin 6** como framework leve. O projeto gerencia uma biblioteca digital com CRUD completo, incluindo interface Bootstrap, testes automatizados abrangentes (>90% cobertura Jacoco) e pipelines GitHub Actions para CI/CD com aprovação manual em produção.
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-| Categoria | Tecnologias |
-|-----------|-------------|
-| **Linguagem** | Java 21 |
-| **Framework Web** | Javalin 6 (API REST + HTML rendering) |
-| **Build Tool** | Gradle (Kotlin DSL) |
-| **Testes Unitários** | JUnit 5 + jqwik (Property-Based Testing) |
-| **Testes E2E** | Selenium WebDriver + WebDriverManager |
-| **Cobertura** | Jacoco |
-| **Interface** | Bootstrap 5 + HTML templates customizados |
+| Categoria | Tecnologias                                            |
+|-----------|--------------------------------------------------------|
+| **Linguagem** | Java 21                                                |
+| **Framework Web** | Javalin 6 (API REST + HTML rendering)                  |
+| **Build Tool** | Gradle (Groovy)                                        |
+| **Testes Unitários** | JUnit 5 + jqwik (Property-Based Testing)               |
+| **Testes E2E** | Selenium WebDriver + WebDriverManager                  |
+| **Cobertura** | Jacoco                                                 |
+| **Interface** | Bootstrap 5 + HTML templates customizados              |
 | **CI/CD** | GitHub Actions (4 workflows: CI, CodeQL, DAST, Deploy) |
-| **Logging** | SLF4J |
+| **Logging** | SLF4J                                                  |
 
 ---
 
-## 🚀 Como Colocar em Execução Localmente
+## Como Colocar em Execução Localmente
 
-### 📋 Pré-requisitos
+### Pré-requisitos
 
 Certifique-se de ter instalado:
 
@@ -44,8 +44,8 @@ Certifique-se de ter instalado:
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/AugustoCedro/tp5-bloco.git
-cd tp5-bloco
+git clone https://github.com/gustalgebaile/TP5_PB2
+cd TP5_PB2
 
 # Build completo com testes e cobertura
 ./gradlew clean build test jacocoTestReport
@@ -81,7 +81,7 @@ cd tp5-bloco
 
 ---
 
-## 📍 Endpoints da API
+## Endpoints da API
 
 A aplicação expõe os seguintes endpoints para gerenciar a biblioteca:
 
@@ -98,69 +98,69 @@ A aplicação expõe os seguintes endpoints para gerenciar a biblioteca:
 
 ---
 
-## 📊 Relatórios de Testes e Cobertura
+## Relatórios de Testes e Cobertura
 
 Após executar `./gradlew test jacocoTestReport`, os relatórios estarão disponíveis em:
 
 ```
 build/reports/
-├── jacoco/test/html/index.html      # 📈 Cobertura de código (meta: >90%)
-├── tests/test/index.html             # ✅ Resultados JUnit 5
-└── jqwik/                             # 🎲 Property-based test reports
+├── jacoco/test/html/index.html      # Cobertura de código (meta: >90%)
+├── tests/test/index.html             # Resultados JUnit 5
+└── jqwik/                             # Property-based test reports
 ```
 
 **Abra `build/reports/jacoco/test/html/index.html` no navegador** para visualizar a cobertura linha-por-linha.
 
 ---
 
-## 🔄 Fluxo de Deployment com GitHub Actions
+## Fluxo de Deployment com GitHub Actions
 
 O repositório inclui **4 workflows automáticos**:
 
-### 1️⃣ **CI/CD Pós-deploy** (`ci.yml`)
+### 1- **Workflow CI/CD** (`gradle-ci.yml`)
 - Compila o código
 - Executa testes (JUnit + jqwik + Selenium)
 - Gera cobertura Jacoco
 - Publica artefatos de build
 
-### 2️⃣ **Análise Estática** (`codeql.yml`)
+### 2️- **Análise Estática** (`codeQL.yml`)
 - CodeQL para detecção de vulnerabilidades
 - Executa em cada push e PR
 
-### 3️⃣ **Testes de Segurança Dinâmicos** (`dast.yml`)
+### 3️- **Testes de Segurança Dinâmicos** (`dastScan.yml`)
 - Simula ataques contra a aplicação rodando
 - Valida proteções contra OWASP Top 10
 
-### 4️⃣ **Deploy Multi-ambiente** (`deploy.yml`)
+### 4️- **Deploy Multi-ambiente** (`deployTests.yml`)
 - Dev: Deploy automático após CI passar
 - Staging: Aprovação manual obrigatória
 - Production: Gate de aprovação manual com requisição de revisor
 
 ---
 
-## 🎉 Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
-✅ **CRUD Completo**
+ **CRUD Completo**
 - Criar, ler, atualizar e deletar livros
 - Suporte a categorias (Fantasia, Romance, Terror, Épico, etc.)
 
-✅ **Interface Responsiva**
+ **Interface Responsiva**
 - Bootstrap 5 para layout moderno
 - Formulários validados frontend + backend
 - Tabela com ações inline (editar/deletar)
 
-✅ **Testes Abrangentes**
+ **Testes Abrangentes**
 - JUnit 5 com testes unitários
 - jqwik para property-based testing (geração de dados randômicos)
 - Selenium WebDriver para E2E (headless Chrome)
 - Cobertura ≥90% via Jacoco
 
-✅ **Segurança**
+ **Segurança**
 - CodeQL para análise estática
 - DAST para testes dinâmicos
 - Validações de entrada em todas as camadas
 
-✅ **DevOps**
+ **DevOps**
 - 4 workflows GitHub Actions orchestrados
 - Deploy automático em dev
 - Aprovações manuais para staging/prod
@@ -168,48 +168,37 @@ O repositório inclui **4 workflows automáticos**:
 
 ---
 
-## 📁 Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
-tp5-bloco/
+TP5-PB2/
 ├── src/
 │   ├── main/java/com/biblioteca/
+│   │   ├── app/               # Classe Main (BibliotecaWebApplication
 │   │   ├── controller/        # Controladores Javalin
 │   │   ├── model/             # Modelos (Book, etc)
+│   │   │   └── enums          # Enums de User/Admin
 │   │   ├── service/           # Lógica de negócio
 │   │   ├── repository/        # Acesso a dados
 │   │   ├── view/              # Renderização HTML
 │   │   └── exception/         # Exceções customizadas
 │   └── test/java/com/biblioteca/
 │       ├── BibliotecaControllerTest.java    # Testes jqwik
-│       └── BookViewTest.java                # Testes Selenium
-├── build.gradle.kts           # Configuração Gradle (Kotlin DSL)
+│       ├── BookViewTest.java                # Testes Selenium
+│       └── UserViewTest.java                # Testes de Segurança
+├── build.gradle          # Configuração Gradle (Groovy)
 ├── .github/workflows/         # Workflows CI/CD
-│   ├── ci.yml
-│   ├── codeql.yml
-│   ├── dast.yml
-│   └── deploy.yml
+│   ├── gradle-ci.yml
+│   ├── codeQL.yml
+│   ├── dastScan.yml
+│   └── deployTests.yml
 ├── README.md
 └── gradlew / gradlew.bat      # Gradle Wrapper
 ```
 
 ---
 
-## 📈 Métricas Atuais do Projeto
-
-```
-Linhas de Código:        ~1200 (main)
-Testes Automatizados:    25+
-Cobertura Jacoco:        92.4%
-Build Time (clean):      ~18 segundos
-Dependências:            28 (Gradle resolution)
-Issues Abertas:          0
-Status CI:               ✅ Passing
-```
-
----
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Erro: "ChromeDriver not found"
 **Solução:** WebDriverManager baixa automaticamente. Reinicie a JVM ou rode `./gradlew test` novamente.
@@ -217,7 +206,7 @@ Status CI:               ✅ Passing
 ### Erro: "Port 7000 already in use"
 **Solução:** Altere a porta no `BibliotecaController.java`:
 ```java
-app.start(8080);  // Mude para 8080 ou outra disponível
+app.start(8080);
 ```
 
 ### Testes Selenium falhando no CI
@@ -236,7 +225,7 @@ app.start(8080);  // Mude para 8080 ou outra disponível
 
 ---
 
-## 📚 Recursos Adicionais
+## Recursos Adicionais
 
 - [Documentação Javalin](https://javalin.io)
 - [JUnit 5 User Guide](https://junit.org/junit5/docs/current/user-guide/)
@@ -246,7 +235,7 @@ app.start(8080);  // Mude para 8080 ou outra disponível
 
 ---
 
-## 📝 Licença
+## Licença
 
 Este projeto está disponível sob licença **MIT**. Consulte `LICENSE` para detalhes.
 
