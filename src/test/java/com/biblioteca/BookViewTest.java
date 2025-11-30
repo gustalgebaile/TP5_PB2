@@ -95,5 +95,124 @@ public class BookViewTest {
 
         Assertions.assertFalse(driver.getPageSource().contains("Frankenstein"));
     }
+
+    @Test
+    void testCreateBookWithAllCategories() {
+        String[] categories = {"Ficção", "Não-Ficção", "Romance", "Mistério",
+                "Fantasia", "Terror", "Ciência Ficção", "Biografia",
+                "Poesia", "Distopia", "Infantil", "Épico"};
+
+        for (String category : categories) {
+            driver.get("http://localhost:7000/biblioteca");
+
+            WebElement link = driver.findElement(By.linkText("Adicionar Novo Livro"));
+            link.click();
+
+            driver.findElement(By.name("name")).sendKeys("Test " + category);
+            driver.findElement(By.name("autor")).sendKeys("Author " + category);
+
+            WebElement categorySelect = driver.findElement(By.name("category"));
+            new Select(categorySelect).selectByVisibleText(category);
+
+            driver.findElement(By.cssSelector("form")).submit();
+
+            Assertions.assertTrue(driver.getCurrentUrl().endsWith("/biblioteca"));
+            String pageSource = driver.getPageSource();
+            Assertions.assertTrue(pageSource.contains(category));
+        }
+    }
+
+    @Test
+    void testEditBookChangeAllFields() {
+        driver.get("http://localhost:7000/biblioteca");
+
+        WebElement link = driver.findElement(By.linkText("Editar"));
+        link.click();
+
+        WebElement nameField = driver.findElement(By.name("name"));
+        nameField.clear();
+        nameField.sendKeys("Name Updated");
+
+        WebElement autorField = driver.findElement(By.name("autor"));
+        autorField.clear();
+        autorField.sendKeys("Autor Updated");
+
+        WebElement categorySelect = driver.findElement(By.name("category"));
+        new Select(categorySelect).selectByVisibleText("Terror");
+
+        driver.findElement(By.cssSelector("form")).submit();
+
+        Assertions.assertTrue(driver.getCurrentUrl().endsWith("/biblioteca"));
+        String pageSource = driver.getPageSource();
+        Assertions.assertTrue(pageSource.contains("Name Updated"));
+        Assertions.assertTrue(pageSource.contains("Terror"));
+    }
+
+    @Test
+    void testTableDisplaysAllBooks() {
+        driver.get("http://localhost:7000/biblioteca");
+
+        WebElement table = driver.findElement(By.tagName("table"));
+        Assertions.assertNotNull(table);
+
+        WebElement thead = driver.findElement(By.tagName("thead"));
+        String headerText = thead.getText();
+        Assertions.assertTrue(headerText.contains("ID"));
+        Assertions.assertTrue(headerText.contains("Nome do Livro"));
+        Assertions.assertTrue(headerText.contains("Autor"));
+        Assertions.assertTrue(headerText.contains("Gênero"));
+        Assertions.assertTrue(headerText.contains("Ações"));
+    }
+
+    @Test
+    void testFormValidationOnNewBook() {
+        driver.get("http://localhost:7000/biblioteca/new");
+
+        WebElement form = driver.findElement(By.tagName("form"));
+        Assertions.assertNotNull(form);
+
+        WebElement nameInput = driver.findElement(By.name("name"));
+        Assertions.assertTrue(nameInput.getAttribute("required") != null);
+
+        WebElement autorInput = driver.findElement(By.name("autor"));
+        Assertions.assertTrue(autorInput.getAttribute("required") != null);
+
+        WebElement categorySelect = driver.findElement(By.name("category"));
+        Assertions.assertTrue(categorySelect.getAttribute("required") != null);
+    }
+
+    @Test
+    void testDeleteMultipleBooks() {
+        for (int i = 0; i < 3; i++) {
+            driver.get("http://localhost:7000/biblioteca/new");
+            driver.findElement(By.name("name")).sendKeys("Book to Delete " + i);
+            driver.findElement(By.name("autor")).sendKeys("Author " + i);
+            new Select(driver.findElement(By.name("category"))).selectByVisibleText("Ficção");
+            driver.findElement(By.cssSelector("form")).submit();
+        }
+
+        driver.get("http://localhost:7000/biblioteca");
+
+        int initialCount = driver.findElements(By.xpath("//tbody//tr")).size();
+
+        // Delete o primeiro livro
+        WebElement deleteButton = driver.findElement(By.xpath("//button[contains(., 'Deletar')]"));
+        deleteButton.click();
+
+        int finalCount = driver.findElements(By.xpath("//tbody//tr")).size();
+
+        Assertions.assertEquals(initialCount - 1, finalCount);
+    }
+
+    @Test
+    void testNavigationBetweenPages() {
+        driver.get("http://localhost:7000/biblioteca");
+
+        driver.findElement(By.linkText("Adicionar Novo Livro")).click();
+        Assertions.assertTrue(driver.getCurrentUrl().contains("/new"));
+
+        driver.navigate().back();
+        Assertions.assertTrue(driver.getCurrentUrl().contains("/biblioteca"));
+    }
 }
 
