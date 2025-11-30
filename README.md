@@ -13,7 +13,7 @@ Repositório desenvolvido para o **TP5_PB** que implementa uma aplicação web c
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 | Categoria | Tecnologias                                            |
 |-----------|--------------------------------------------------------|
@@ -40,7 +40,7 @@ Certifique-se de ter instalado:
 - [Git](https://git-scm.com/) — Para clonar o repositório
 - Chrome/Chromium — Necessário para testes Selenium (o WebDriverManager baixa automaticamente)
 
-### ⚡ Início Rápido
+### Início Rápido
 
 ```bash
 # Clonar o repositório
@@ -57,7 +57,7 @@ cd TP5_PB2
 # http://localhost:7000/biblioteca
 ```
 
-### 🔧 Comandos Úteis
+### Comandos Úteis
 
 ```bash
 # Apenas compilar (sem testes)
@@ -234,11 +234,3 @@ app.start(8080);
 - [GitHub Actions Best Practices](https://docs.github.com/en/actions/guides)
 
 ---
-
-## Licença
-
-Este projeto está disponível sob licença **MIT**. Consulte `LICENSE` para detalhes.
-
----
-
-**Desenvolvido para TP5_PB2** | 🚀 **Pronto para produção!**
