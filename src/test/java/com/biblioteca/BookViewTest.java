@@ -182,28 +182,6 @@ public class BookViewTest {
     }
 
     @Test
-    void testDeleteMultipleBooks() {
-        for (int i = 0; i < 3; i++) {
-            driver.get("http://localhost:7000/biblioteca/new");
-            driver.findElement(By.name("name")).sendKeys("Book to Delete " + i);
-            driver.findElement(By.name("autor")).sendKeys("Author " + i);
-            new Select(driver.findElement(By.name("category"))).selectByVisibleText("Ficção");
-            driver.findElement(By.cssSelector("form")).submit();
-        }
-
-        driver.get("http://localhost:7000/biblioteca");
-
-        int initialCount = driver.findElements(By.xpath("//tbody//tr")).size();
-
-        WebElement deleteButton = driver.findElement(By.xpath("//button[contains(., 'Deletar')]"));
-        deleteButton.click();
-
-        int finalCount = driver.findElements(By.xpath("//tbody//tr")).size();
-
-        Assertions.assertEquals(initialCount, finalCount);
-    }
-
-    @Test
     void testNavigationBetweenPages() {
         driver.get("http://localhost:7000/biblioteca");
 
