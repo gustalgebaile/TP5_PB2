@@ -93,7 +93,7 @@ public class BookViewTest {
         );
         deleteButton.click();
 
-        Assertions.assertTrue(!driver.getPageSource().contains("Frankenstein"));
+        Assertions.assertFalse(driver.getPageSource().contains("Frankenstein"));
     }
 
     @Test
