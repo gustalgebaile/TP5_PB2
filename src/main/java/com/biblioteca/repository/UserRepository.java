@@ -11,8 +11,8 @@ public class UserRepository {
     private List<User> repository = new ArrayList<>();
 
     public UserRepository() {
-        User u1 = new User("alice@admin.com", Role.ADMIN);
-        User u2 = new User("bob@user.com", Role.USER);
+        User u1 = new User("antonio@admin.com", Role.ADMIN);
+        User u2 = new User("gusta@user.com", Role.USER);
         repository.addAll(List.of(u1,u2));
     }
 

@@ -21,7 +21,7 @@ public class UserController {
             User user = service.getUserByEmail(email);
 
             if (user.getRole() == Role.ADMIN) {
-                ctx.result("Bem vindo admin " + user.getEmail() + "! Chave:" + SECRET_KEY);
+                ctx.result("Bem vindo administrador " + user.getEmail() + "! Chave:" + SECRET_KEY);
             } else {
                 ctx.result("Bem vindo " + user.getEmail() + "!");
             }

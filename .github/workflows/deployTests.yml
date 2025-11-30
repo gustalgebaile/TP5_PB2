@@ -1,4 +1,4 @@
-name: Pipeline Java com ambientes
+name: Pipeline Java
 
 on:
   push:
@@ -6,10 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
-  # ==========================
-  # JOB 1 — BUILD
-  # ==========================
   build:
     runs-on: ubuntu-latest
     steps:
@@ -47,9 +43,6 @@ jobs:
           echo "- Artefato: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
           echo "- Relatório de testes: build/reports/tests/index.html" >> $GITHUB_STEP_SUMMARY
 
-  # ==========================
-  # JOB 2 — DEPLOY DEV
-  # ==========================
   deploy-dev:
     needs: build
     runs-on: ubuntu-latest
@@ -72,9 +65,6 @@ jobs:
           echo "- Ambiente: development" >> $GITHUB_STEP_SUMMARY
           echo "- Artefato usado: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
 
-  # ==========================
-  # JOB 3 — DEPLOY PROD
-  # ==========================
   deploy-prod:
     needs: build
     runs-on: ubuntu-latest

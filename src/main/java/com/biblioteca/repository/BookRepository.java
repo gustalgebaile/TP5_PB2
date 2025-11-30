@@ -11,16 +11,16 @@ public class BookRepository {
     private List<Book> repository = new ArrayList<>();
 
     public BookRepository() {
-        Book c1 = new Book("Alice no País das Maravilhas", "Lewis Carroll");
-        Book c2 = new Book("O Senhor dos Anéis", "J.R.R. Tolkien");
-        Book c3 = new Book("Harry Potter", "J.K. Rowling");
-        Book c4 = new Book("Jogos Vorazes", "Suzanne Collins");
-        Book c5 = new Book("O Diário de Anne Frank", "Anne Frank");
-        Book c6 = new Book("Frankenstein", "Mary Shelley");
-        Book c7 = new Book("Turma da Mônica", "Mauricio de Sousa");
-        Book c8 = new Book("Memórias Póstumas de Brás Cubas", "Machado de Assis");
-        Book c9 = new Book("A Odisseia", "Homero");
-        Book c10 = new Book("Dom Casmurro", "Machado de Assis");
+        Book c1 = new Book("Alice no País das Maravilhas", "Lewis Carroll", "Fantasia");
+        Book c2 = new Book("O Senhor dos Anéis", "J.R.R. Tolkien", "Fantasia");
+        Book c3 = new Book("Harry Potter", "J.K. Rowling", "Fantasia");
+        Book c4 = new Book("Jogos Vorazes", "Suzanne Collins", "Distopia");
+        Book c5 = new Book("O Diário de Anne Frank", "Anne Frank", "Biografia");
+        Book c6 = new Book("Frankenstein", "Mary Shelley", "Terror");
+        Book c7 = new Book("Turma da Mônica", "Mauricio de Sousa", "Infantil");
+        Book c8 = new Book("Memórias Póstumas de Brás Cubas", "Machado de Assis", "Romance");
+        Book c9 = new Book("A Odisseia", "Homero", "Épico");
+        Book c10 = new Book("Dom Casmurro", "Machado de Assis", "Romance");
 
         repository.addAll(List.of(c1,c2,c3,c4,c5,c6,c7,c8,c9,c10));
     }
@@ -47,6 +47,7 @@ public class BookRepository {
             if(Objects.equals(book.getId(), newBook.getId())){
                 book.setAutor(newBook.getAutor());
                 book.setName(newBook.getName());
+                book.setCategory(newBook.getCategory());
             }
         }
     }

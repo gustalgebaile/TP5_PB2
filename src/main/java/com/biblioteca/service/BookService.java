@@ -29,7 +29,7 @@ public class BookService {
         if(isBookDataValid(book)){
             repository.addBook(book);
         }else{
-            throw new IllegalArgumentException("Dados de criação não devem ser nulos");
+            throw new IllegalArgumentException("As informações de criação não podem ser nulos");
         }
     }
 
@@ -38,7 +38,7 @@ public class BookService {
             if(isBookDataValid(book)){
                 repository.updateBook(book);
             }else{
-                throw new IllegalArgumentException("Dados de alteração não devem ser nulos");
+                throw new IllegalArgumentException("As informações de alteração não podem ser nulos");
             }
         }
     }
@@ -61,7 +61,7 @@ public class BookService {
     }
 
     private boolean isBookDataValid(Book book){
-        return book.getName() != "" && book.getAutor() != "" && book.getName() != null && book.getAutor() != null ;
+        return book.getName() != "" && book.getAutor() != "" && book.getCategory() != "" && book.getName() != null && book.getAutor() != null && book.getCategory() != null;
     }
 
 

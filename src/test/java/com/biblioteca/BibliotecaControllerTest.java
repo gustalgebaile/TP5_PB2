@@ -20,26 +20,31 @@ public class BibliotecaControllerTest {
         Book.resetSequence();
         controller = new BibliotecaController();
     }
+
     @Provide
-    Arbitrary<Book> validBooks(){
+    Arbitrary<Book> validBooks() {
         Arbitrary<String> names = Arbitraries.strings()
                 .withCharRange('a','z')
                 .ofMinLength(3)
                 .ofMaxLength(20);
 
-        Arbitrary<String> emails = Arbitraries.strings()
+        Arbitrary<String> autors = Arbitraries.strings()
                 .withCharRange('a','z')
                 .ofMinLength(3)
-                .map(s -> s + "aa");
+                .ofMaxLength(20);
 
-        return Combinators.combine(names,emails).as(Book::new);
+        Arbitrary<String> categories = Arbitraries.of("Ficção", "Não-Ficção", "Romance", "Mistério",
+                "Fantasia", "Terror", "Ciência Ficção", "Biografia", "Poesia");
+
+        return Combinators.combine(names, autors, categories).as(Book::new);
     }
 
     @Provide
     Arbitrary<Book> invalidBooks() {
         Arbitrary<String> names = Arbitraries.of("", null);
-        Arbitrary<String> emails = Arbitraries.of("", null);
-        return Combinators.combine(names, emails).as(Book::new);
+        Arbitrary<String> autors = Arbitraries.of("", null);
+        Arbitrary<String> categories = Arbitraries.of("", null);
+        return Combinators.combine(names, autors, categories).as(Book::new);
     }
 
     @Provide
@@ -48,64 +53,70 @@ public class BibliotecaControllerTest {
                 .withCharRange('a', 'z')
                 .ofMinLength(3)
                 .ofMaxLength(20);
-    };
+    }
 
     @Provide
     Arbitrary<String> validAutors() {
         return Arbitraries.strings()
                 .withCharRange('a','z')
                 .ofMinLength(3)
-                .map(s -> s + "aa");
-    };
+                .ofMaxLength(20);
+    }
+
+    @Provide
+    Arbitrary<String> validCategories() {
+        return Arbitraries.of("Ficção", "Não-Ficção", "Romance", "Mistério",
+                "Fantasia", "Terror", "Ciência Ficção", "Biografia", "Poesia");
+    }
 
     @Provide
     Arbitrary<String> invalidData() {
         return Arbitraries.of("", null);
-    };
+    }
 
     @Provide
-    Arbitrary<String> invalidAutors() {
-        return Arbitraries.strings()
-                .withCharRange('a','z')
-                .ofMinLength(3)
-                .map(s -> s + "aa");
-    };
-    @Provide Arbitrary<Integer> mockedBookIds() { return Arbitraries.of(1,2,3,4,5,6,7,8,9,10); }
+    Arbitrary<Integer> mockedBookIds() {
+        return Arbitraries.of(1,2,3,4,5,6,7,8,9,10);
+    }
 
     @Example
-    void getNotExistingBookById(){
-        assertThrows(BookNotFoundException.class,() -> {
+    void getNotExistingBookById() {
+        assertThrows(BookNotFoundException.class, () -> {
             controller.getBookById(-10);
         });
     }
 
     @Property
-    boolean createBookAndFindByIdWorks(@ForAll("validBooks") Book book){
+    boolean createBookAndFindByIdWorks(@ForAll("validBooks") Book book) {
         controller.createBook(book);
-
         return controller.getBookById(book.getId()) != null;
     }
 
     @Property
-    void createBookFailed(@ForAll("invalidBooks") Book book){
+    void createBookFailed(@ForAll("invalidBooks") Book book) {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             controller.createBook(book);
         });
     }
 
     @Example
-    void updateBookWithValidData(@ForAll("validNames") String name,@ForAll("validAutors") String autor,@ForAll("mockedBookIds") int id){
+    void updateBookWithValidData(@ForAll("validNames") String name,
+                                 @ForAll("validAutors") String autor,
+                                 @ForAll("validCategories") String category,
+                                 @ForAll("mockedBookIds") int id) {
         assertDoesNotThrow(() -> {
-            controller.updateBook(new Book(id,name,autor));
+            controller.updateBook(new Book(id, name, autor, category));
         });
     }
 
     @Example
-    void updateBookWithInvalidData(@ForAll("invalidData") String data,@ForAll("mockedBookIds") int id){
-        assertThrows(IllegalArgumentException.class,() -> {
-            controller.updateBook(new Book(id,data,data));
+    void updateBookWithInvalidData(@ForAll("invalidData") String invalidName,
+                                   @ForAll("invalidData") String invalidAutor,
+                                   @ForAll("invalidData") String invalidCategory,
+                                   @ForAll("mockedBookIds") int id) {
+        assertThrows(IllegalArgumentException.class, () -> {
+            controller.updateBook(new Book(id, invalidName, invalidAutor, invalidCategory));
         });
-
     }
 
     @Example
@@ -114,19 +125,16 @@ public class BibliotecaControllerTest {
         Book book = controller.getBiblioteca().get(0);
         int id = book.getId();
         assertDoesNotThrow(() -> controller.deleteBookById(id));
-        assertThrows(BookNotFoundException.class,() -> {
+        assertThrows(BookNotFoundException.class, () -> {
             service.isBookFound(id);
         });
     }
+
     @Example
     void deleteNotExistingBook() {
         int id = 1024091240;
-        assertThrows(BookNotFoundException.class,() -> {
+        assertThrows(BookNotFoundException.class, () -> {
             controller.deleteBookById(id);
         });
     }
-
-
-
-
 }

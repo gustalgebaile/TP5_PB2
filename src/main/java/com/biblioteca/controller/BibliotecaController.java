@@ -20,7 +20,8 @@ public class BibliotecaController {
         app.post("/biblioteca",ctx ->{
             String name = ctx.formParam("name");
             String autor = ctx.formParam("autor");
-            service.createBook(new Book(name,autor));
+            String category = ctx.formParam("category");
+            service.createBook(new Book(name,autor,category));
             ctx.redirect("/biblioteca");
         });
         app.get("/biblioteca/edit/{id}",ctx -> {
@@ -31,6 +32,7 @@ public class BibliotecaController {
                 model.put("id", book.getId());
                 model.put("name", book.getName());
                 model.put("autor", book.getAutor());
+                model.put("category", book.getCategory());
                 ctx.html(BookView.renderForm(model));
             }else{
                 ctx.status(404).result("Livro não encontrado");
@@ -40,7 +42,8 @@ public class BibliotecaController {
             int id =  ctx.pathParamAsClass("id",Integer.class).get();
             String name = ctx.formParam("name");
             String autor = ctx.formParam("autor");
-            service.updateBook(new Book(id,name,autor));
+            String category = ctx.formParam("category");
+            service.updateBook(new Book(id,name,autor,category));
             ctx.redirect("/biblioteca");
         });
 
@@ -71,7 +74,6 @@ public class BibliotecaController {
     public void updateBook(Book book){
         service.updateBook(book);
     }
-
 
     public void deleteBookById(int id) {
         service.deleteBookById(id);

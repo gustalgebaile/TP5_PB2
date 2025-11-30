@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "Esperando aplicação iniciar na porta 7000..."
           for i in {1..60}; do
-            if curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
+            if curl -sSf "http://localhost:7000/hello?user=gusta@user.com" >/dev/null 2>&1; then
               echo "Aplicação está pronta!"
               break
             fi
@@ -55,7 +55,7 @@ jobs:
             sleep 2
           done
           
-          if ! curl -sSf "http://localhost:7000/hello?user=bob@user.com" >/dev/null 2>&1; then
+          if ! curl -sSf "http://localhost:7000/hello?user=gusta@user.com" >/dev/null 2>&1; then
             echo "A aplicação não subiu. Logs:"
             cat logs.txt || true
             exit 1
@@ -114,7 +114,7 @@ jobs:
       - name: DAST Summary
         if: always()
         run: |
-          echo "## Resumo DAST Scan" >> $GITHUB_STEP_SUMMARY
+          echo "## Resumo do DAST Scan" >> $GITHUB_STEP_SUMMARY
           echo "- Status do Job: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "- Artefatos gerados:" >> $GITHUB_STEP_SUMMARY
           echo "  - zap-reports/zap_report.html" >> $GITHUB_STEP_SUMMARY

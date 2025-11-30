@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Select;
 
 public class BookViewTest {
 
@@ -50,13 +51,17 @@ public class BookViewTest {
         driver.findElement(By.name("name")).sendKeys("Dom Casmurgo");
         driver.findElement(By.name("autor")).sendKeys("Machado de Assis");
 
+        WebElement categorySelect = driver.findElement(By.name("category"));
+        new Select(categorySelect).selectByVisibleText("Romance");
+
         driver.findElement(By.cssSelector("form")).submit();
 
         Assertions.assertTrue(driver.getCurrentUrl().endsWith("/biblioteca"));
-
         String pageSource = driver.getPageSource();
         Assertions.assertTrue(pageSource.contains("Dom Casmurgo"));
+        Assertions.assertTrue(pageSource.contains("Romance")); // opcional
     }
+
     @Test
     void testEditBook() {
         driver.get("http://localhost:7000/biblioteca");
@@ -64,13 +69,17 @@ public class BookViewTest {
         WebElement link = driver.findElement(By.linkText("Editar"));
         link.click();
 
+        driver.findElement(By.name("name")).clear();
         driver.findElement(By.name("name")).sendKeys("editedBook");
+        driver.findElement(By.name("autor")).clear();
         driver.findElement(By.name("autor")).sendKeys("editedBookAutor");
+
+        WebElement categorySelect = driver.findElement(By.name("category"));
+        new Select(categorySelect).selectByVisibleText("Fantasia");
 
         driver.findElement(By.cssSelector("form")).submit();
 
         Assertions.assertTrue(driver.getCurrentUrl().endsWith("/biblioteca"));
-
         String pageSource = driver.getPageSource();
         Assertions.assertTrue(pageSource.contains("editedBook"));
     }
