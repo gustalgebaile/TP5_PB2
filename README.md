@@ -185,7 +185,14 @@ TP5-PB2/
 │   └── test/java/com/biblioteca/
 │       ├── BibliotecaControllerTest.java    # Testes jqwik
 │       ├── BookViewTest.java                # Testes Selenium
-│       └── UserViewTest.java                # Testes de Segurança
+│       ├── UserViewTest.java                # Testes de Segurança
+│       ├── BookRepositoryTest.java          
+│       ├── BookRepositoryGapsTest.java      
+│       ├── BookServiceTest.java             
+│       ├── ExceptionTest.java               
+│       ├── UserControllerGaps.java          
+│       ├── UserRepositoryTest.java          
+│       └── UserServiceTest.java             
 ├── build.gradle          # Configuração Gradle (Groovy)
 ├── .github/workflows/         # Workflows CI/CD
 │   ├── gradle-ci.yml
