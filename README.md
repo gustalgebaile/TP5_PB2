@@ -231,13 +231,3 @@ app.start(8080);
 ```
 
 ---
-
-## Recursos Adicionais
-
-- [Documentação Javalin](https://javalin.io)
-- [JUnit 5 User Guide](https://junit.org/junit5/docs/current/user-guide/)
-- [jqwik Property-Based Testing](https://jqwik.net)
-- [Selenium Documentation](https://www.selenium.dev/documentation/)
-- [GitHub Actions Best Practices](https://docs.github.com/en/actions/guides)
-
----
