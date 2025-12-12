@@ -1,1 +1,68 @@
-[Cole o código completo do arquivo 3]
+name: Alertas de Falha
+
+on:
+  workflow_run:
+    workflows: ["Workflow CI/CD", "Pipeline Java"]
+    types: [completed]
+
+jobs:
+  notify-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+
+    steps:
+      - name: Criar Issue de Alerta
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowName = '${{ github.event.workflow_run.name }}';
+            const runId = '${{ github.event.workflow_run.id }}';
+            const branch = '${{ github.event.workflow_run.head_branch }}';
+            const sha = '${{ github.event.workflow_run.head_sha }}';
+            const url = '${{ github.event.workflow_run.html_url }}';
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: ` Pipeline Falhou - ${workflowName}`,
+              body: `
+            ## Falha no Pipeline
+            
+            **Workflow:** ${workflowName}
+            **Run ID:** ${runId}
+            **Branch:** ${branch}
+            **Commit:** ${sha}
+            **Status:** failure
+            **Timestamp:** ${new Date().toISOString()}
+            
+            [ Ver Detalhes do Workflow](${url})
+            
+            ### Ação Necessária
+            Por favor, verifique os logs e corrija os erros o mais rápido possível.
+            `,
+              labels: ['bug', 'ci-failure', 'urgent']
+            });
+
+      - name: Registrar no Summary
+        run: |
+          echo "## Alerta de Falha Criado" >> $GITHUB_STEP_SUMMARY
+          echo "- Workflow: ${{ github.event.workflow_run.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: failure" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.event.workflow_run.head_branch }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Uma issue foi criada automaticamente" >> $GITHUB_STEP_SUMMARY
+
+  log-metrics:
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Registrar Métricas do Pipeline
+        run: |
+          echo "## Métricas do Pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "| Métrica | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Workflow | ${{ github.event.workflow_run.name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ github.event.workflow_run.conclusion }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.event.workflow_run.head_branch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tentativa | ${{ github.event.workflow_run.run_attempt }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Timestamp | $(date -u +"%Y-%m-%d %H:%M:%S UTC") |" >> $GITHUB_STEP_SUMMARY
