@@ -25,7 +25,6 @@ public class BookRepository {
 
         repository.addAll(List.of(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10));
     }
-
     public List<Book> getRepository() {
         return new ArrayList<>(repository);
     }
@@ -38,19 +37,15 @@ public class BookRepository {
         }
         throw new BookNotFoundException("Livro com ID " + id + " não encontrado");
     }
-
     public void addBook(Book book) {
         if (book == null) {
             throw new IllegalArgumentException("Livro não pode ser nulo");
         }
         repository.add(book);
     }
-
     public void updateBook(Book newBook) {
         if (newBook == null) {
-            throw new IllegalArgumentException("Livro não pode ser nulo");
-        }
-
+            throw new IllegalArgumentException("Livro não pode ser nulo");}
         for (Book book : repository) {
             if (Objects.equals(book.getId(), newBook.getId())) {
                 book.setAutor(newBook.getAutor());
@@ -58,8 +53,7 @@ public class BookRepository {
                 book.setCategory(newBook.getCategory());
                 return;
             }
-        }
-        throw new BookNotFoundException("Livro com ID " + newBook.getId() + " não encontrado");
+        } throw new BookNotFoundException("Livro com ID " + newBook.getId() + " não encontrado");
     }
     public void deleteBook(int id) {
         for (Book book : repository) {
@@ -67,14 +61,11 @@ public class BookRepository {
                 repository.remove(book);
                 return;
             }
-        }
-        throw new BookNotFoundException("Livro com ID " + id + " não encontrado");
+        } throw new BookNotFoundException("Livro com ID " + id + " não encontrado");
     }
-
     public boolean exists(int id) {
         return repository.stream().anyMatch(b -> b.getId() == id);
     }
-
     public int size() {
         return repository.size();
     }

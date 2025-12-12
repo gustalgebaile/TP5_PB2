@@ -45,7 +45,6 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
-
       - name: Resumo CodeQL
         if: always()
         run: |

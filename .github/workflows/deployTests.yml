@@ -1,4 +1,4 @@
-name: Pipeline Java
+name: Pipeline Java com Testes Pós-Deploy
 
 on:
   push:
@@ -22,10 +22,19 @@ jobs:
       - name: Dar permissão ao Gradlew
         run: chmod +x gradlew
 
-      - name: Instalar Chrome (para Selenium)
+      - name: Instalar Chrome e ChromeDriver
         run: |
           sudo apt update
           sudo apt install -y google-chrome-stable
+          
+          # Baixar ChromeDriver compatível
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
+          wget -q "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}" -O /tmp/version
+          DRIVER_VERSION=$(cat /tmp/version)
+          wget -q "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Compilar, testar e construir JAR
         run: ./gradlew clean test shadowJar
@@ -36,13 +45,6 @@ jobs:
           name: app
           path: build/libs/*-all.jar
 
-      - name: Build Summary
-        run: |
-          echo "## Resumo do Build" >> $GITHUB_STEP_SUMMARY
-          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Artefato: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
-          echo "- Relatório de testes: build/reports/tests/index.html" >> $GITHUB_STEP_SUMMARY
-
   deploy-dev:
     needs: build
     runs-on: ubuntu-latest
@@ -50,23 +52,69 @@ jobs:
     environment: development
 
     steps:
+      - name: Checkout de Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Baixar artefato
         uses: actions/download-artifact@v4
         with:
           name: app
 
-      - name: Deploy em ambiente de desenvolvimento
-        run: echo "Aplicação implantada em DEV"
+      - name: Instalar Chrome e ChromeDriver
+        run: |
+          sudo apt update
+          sudo apt install -y google-chrome-stable
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
+          wget -q "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}" -O /tmp/version
+          DRIVER_VERSION=$(cat /tmp/version)
+          wget -q "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
+
+      - name: Iniciar Aplicação
+        run: |
+          java -jar *-all.jar &
+          echo $! > app.pid
+          sleep 10  # Aguardar aplicação iniciar
+
+      - name: Verificar se aplicação está rodando
+        run: |
+          curl -f http://localhost:7000/books || exit 1
+
+      - name: Executar Testes Selenium Pós-Deploy
+        run: |
+          chmod +x gradlew
+          ./gradlew test --tests BookViewTest --tests UserViewTest
+
+      - name: Upload Relatório de Testes Selenium
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-test-report-dev
+          path: build/reports/tests/test
+
+      - name: Parar Aplicação
+        if: always()
+        run: |
+          kill $(cat app.pid) || true
 
       - name: Deploy DEV Summary
         run: |
           echo "## Resumo Deploy DEV" >> $GITHUB_STEP_SUMMARY
           echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "- Ambiente: development" >> $GITHUB_STEP_SUMMARY
-          echo "- Artefato usado: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
+          echo "- Testes Selenium: Executados" >> $GITHUB_STEP_SUMMARY
+          echo "- URL Testada: http://localhost:7000" >> $GITHUB_STEP_SUMMARY
 
   deploy-prod:
-    needs: build
+    needs: deploy-dev
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     environment:
@@ -74,16 +122,57 @@ jobs:
       url: https://meuapp-producao.com
 
     steps:
+      - name: Checkout de Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Baixar artefato
         uses: actions/download-artifact@v4
         with:
           name: app
 
-      - name: Aprovação manual
-        run: echo "Aguardando aprovação para produção"
+      - name: Instalar Chrome e ChromeDriver
+        run: |
+          sudo apt update
+          sudo apt install -y google-chrome-stable
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
+          wget -q "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}" -O /tmp/version
+          DRIVER_VERSION=$(cat /tmp/version)
+          wget -q "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
 
-      - name: Deploy em ambiente de produção
+      - name: Deploy em Produção
         run: echo "Aplicação implantada em produção"
+
+      - name: Iniciar Aplicação
+        run: |
+          java -jar *-all.jar &
+          echo $! > app.pid
+          sleep 10
+
+      - name: Smoke Tests com Selenium
+        run: |
+          chmod +x gradlew
+          ./gradlew test --tests BookViewTest.testViewAllBooks --tests UserViewTest
+
+      - name: Upload Relatório Smoke Tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-smoke-tests-prod
+          path: build/reports/tests/test
+
+      - name: Parar Aplicação
+        if: always()
+        run: |
+          kill $(cat app.pid) || true
 
       - name: Deploy PROD Summary
         run: |
@@ -91,4 +180,4 @@ jobs:
           echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "- Ambiente: production" >> $GITHUB_STEP_SUMMARY
           echo "- URL: https://meuapp-producao.com" >> $GITHUB_STEP_SUMMARY
-          echo "- Artefato usado: build/libs/*-all.jar" >> $GITHUB_STEP_SUMMARY
+          echo "- Smoke Tests: Executados com sucesso" >> $GITHUB_STEP_SUMMARY

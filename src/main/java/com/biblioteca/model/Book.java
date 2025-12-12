@@ -21,6 +21,7 @@ public class Book {
         this.autor = autor;
         this.category = category;
     }
+
 //Setters e Getters
     public Integer getId() {
         return id;

@@ -1,0 +1,77 @@
+name: Monitoring e Alertas
+
+on:
+  workflow_run:
+    workflows: ["Workflow CI/CD", "Pipeline Java"]
+    types:
+      - completed
+
+jobs:
+  analyze-results:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Analisar Status do Workflow
+        id: status
+        run: |
+          echo "workflow_status=${{ github.event.workflow_run.conclusion }}" >> $GITHUB_OUTPUT
+          echo "workflow_name=${{ github.event.workflow_run.name }}" >> $GITHUB_OUTPUT
+          echo "run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
+
+      - name: Baixar Logs do Workflow
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: test-report
+          path: ./logs
+
+      - name: Processar Métricas de Teste
+        run: |
+          if [ -d "./logs" ]; then
+            echo "## Análise de Logs" >> $GITHUB_STEP_SUMMARY
+            echo "### Workflow: ${{ steps.status.outputs.workflow_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Status: ${{ steps.status.outputs.workflow_status }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Run ID: ${{ steps.status.outputs.run_id }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
+          
+            # Contar arquivos de teste
+            TEST_FILES=$(find ./logs -name "*.html" | wc -l)
+            echo "- Arquivos de relatório encontrados: $TEST_FILES" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Enviar Notificação de Falha
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Pipeline Falhou - ${{ github.event.workflow_run.name }}`,
+              body: `
+              ## Falha no Pipeline
+            
+              **Workflow:** ${{ github.event.workflow_run.name }}
+              **Run ID:** ${{ github.event.workflow_run.id }}
+              **Branch:** ${{ github.event.workflow_run.head_branch }}
+              **Status:** ${{ github.event.workflow_run.conclusion }}
+              **Timestamp:** ${new Date().toISOString()}
+            
+              [Ver Detalhes](${{ github.event.workflow_run.html_url }})
+            
+              Por favor, investigue e corrija os erros.
+              `,
+              labels: ['bug', 'ci-failure']
+            });
+            console.log('Issue criada:', issue.data.html_url);
+
+      - name: Criar Métricas de Performance
+        run: |
+          echo "## Métricas do Pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "| Métrica | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ github.event.workflow_run.conclusion }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Duração | $(( (${{ github.event.workflow_run.updated_at }} - ${{ github.event.workflow_run.created_at }}) / 60 )) min |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tentativa | ${{ github.event.workflow_run.run_attempt }} |" >> $GITHUB_STEP_SUMMARY

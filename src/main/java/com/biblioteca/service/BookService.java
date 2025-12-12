@@ -24,7 +24,6 @@ public class BookService {
         }
         throw new BookNotFoundException("Livro com ID: " + id + " não encontrado");
     }
-
     public void createBook(Book book) {
         if(isBookDataValid(book)){
             repository.addBook(book);
@@ -32,7 +31,6 @@ public class BookService {
             throw new IllegalArgumentException("As informações de criação não podem ser nulos");
         }
     }
-
     public void updateBook(Book book) {
         if(isBookFound(book.getId())){
             if(isBookDataValid(book)){
@@ -42,7 +40,6 @@ public class BookService {
             }
         }
     }
-
     public void deleteBookById(int id) {
         if(isBookFound(id)){
             repository.deleteBook(id);
@@ -51,7 +48,6 @@ public class BookService {
             throw new BookNotFoundException("Livro com ID: " + id + " não encontrado");
         }
     }
-
     public boolean isBookFound(int id) {
         Book book = repository.findBookById(id);
         if (book != null) {
@@ -59,10 +55,8 @@ public class BookService {
         }
         throw new BookNotFoundException("Livro com ID: " + id + " não encontrado");
     }
-
     private boolean isBookDataValid(Book book){
         return book.getName() != "" && book.getAutor() != "" && book.getCategory() != "" && book.getName() != null && book.getAutor() != null && book.getCategory() != null;
     }
-
 
 }
