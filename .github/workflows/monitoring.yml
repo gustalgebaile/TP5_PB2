@@ -49,7 +49,7 @@ jobs:
             const issue = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `⚠️ Pipeline Falhou - ${{ github.event.workflow_run.name }}`,
+              title: `Pipeline Falhou - ${{ github.event.workflow_run.name }}`,
               body: `
               ## Falha no Pipeline
             

@@ -71,7 +71,7 @@ jobs:
         with:
           name: jacoco-report
           path: build/reports/jacoco/test/html
-          retention-days: 7  # Otimizar armazenamento
+          retention-days: 7
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
