@@ -4,6 +4,7 @@
 [![CodeQL Analysis](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/codeQL.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/codeQL.yml)
 [![DAST Scan](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/dastScan.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/dastScan.yml)
 [![Pipeline Java](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/deployTests.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/deployTests.yml)
+[![Alertas de Falha](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/alert.yml/badge.svg)](https://github.com/gustalgebaile/TP5_PB2/actions/workflows/alert.yml)
 
 ---
 
@@ -24,7 +25,7 @@ Repositório desenvolvido para o **TP5_PB** que implementa uma aplicação web c
 | **Testes E2E** | Selenium WebDriver + WebDriverManager                  |
 | **Cobertura** | Jacoco                                                 |
 | **Interface** | Bootstrap 5 + HTML templates customizados              |
-| **CI/CD** | GitHub Actions (4 workflows: CI, CodeQL, DAST, Deploy) |
+| **CI/CD** | GitHub Actions (5 workflows: CI, CodeQL, DAST, Deploy, Alertas) |
 | **Logging** | SLF4J                                                  |
 
 ---
@@ -115,66 +116,163 @@ build/reports/
 
 ## Fluxo de Deployment com GitHub Actions
 
-O repositório inclui **4 workflows automáticos**:
+O repositório inclui **5 workflows automáticos**:
 
-### 1- **Workflow CI/CD** (`gradle-ci.yml`)
-- Compila o código
+### 1️- **Workflow CI/CD** (`gradle-ci.yml`)
+Executa em cada push/PR para `master` ou `main`:
+- Compila o código com Gradle
 - Executa testes (JUnit + jqwik + Selenium)
 - Gera cobertura Jacoco
-- Publica artefatos de build
+- **Otimização:** Build paralelo com flag `--parallel` (reduz tempo ~30%)
+- Publica artefatos de build e relatórios
 
-### 2️- **Análise Estática** (`codeQL.yml`)
+### 2- **Análise Estática** (`codeQL.yml`)
 - CodeQL para detecção de vulnerabilidades
-- Executa em cada push e PR
+- Executa em cada push, PR e semanalmente
+- Identifica padrões de código inseguro
 
 ### 3️- **Testes de Segurança Dinâmicos** (`dastScan.yml`)
+- OWASP ZAP para testes dinâmicos
 - Simula ataques contra a aplicação rodando
 - Valida proteções contra OWASP Top 10
 
-### 4️- **Deploy Multi-ambiente** (`deployTests.yml`)
-- Dev: Deploy automático após CI passar
-- Staging: Aprovação manual obrigatória
-- Production: Gate de aprovação manual com requisição de revisor
+### 4️- **Pipeline de Deploy e Testes Pós-Deploy** (`deployTests.yml`)
+Gerencia o ciclo de vida de entrega com validação contínua:
 
----
+#### **Build**
+Compila e gera o artefato executável .jar:
+- Checkout do código
+-  Setup Java 21
+-  Cache Gradle para otimizar dependências
+-  Execução de testes completos
+-  Geração do Shadow JAR (artefato executável)
+-  Armazenamento de artefatos para próximas etapas
+
+#### **Deploy Dev**
+Realiza o deploy automático no ambiente de desenvolvimento com validação completa:
+-  Download do artefato JAR
+-  Instalação de dependências (Chrome para Selenium)
+-  **Inicialização automática da aplicação** para testes
+-  **Health check via curl** para validar disponibilidade
+-  **Execução de testes Selenium pós-deploy** (BookViewTest + UserViewTest)
+- Testa todos os endpoints da API
+- Valida funcionamento da interface web
+- Detecta regressões imediatamente
+-  Upload automático de relatórios de teste
+-  Parada controlada da aplicação
+-  Execução automática - sem aprovação necessária
+
+#### **Deploy Prod**
+Possui uma proteção de ambiente (environment: production), exigindo aprovação manual antes de implantar a versão em produção:
+-  Aprovação manual obrigatória no GitHub
+-  Download do artefato JAR
+-  Deploy em ambiente de produção
+-  **Smoke tests críticos com Selenium**
+- Testa funcionalidades essenciais apenas
+- Valida que a aplicação está operacional
+- Reduz tempo de execução
+-  Upload de relatórios de smoke tests
+-  Fluxo corporativo seguro com rastreamento completo
+-  Monitoramento e métricas para auditoria
+
+**Fluxo Completo:**
+```
+Build (Automático)
+  ↓
+Deploy Dev (Automático) → Testes Selenium Completos → Upload Reports
+  ↓
+Deploy Prod (Aprovação Manual) → Smoke Tests → Upload Reports
+```
+
+### 5️- **Sistema de Monitoramento e Alertas** (`alert.yml`)
+Fornece visibilidade operacional contínua com detecção automática de falhas em tempo real:
+
+#### **Detecção de Falhas**
+Monitora a conclusão de todos os workflows e identifica problemas:
+-  Ativação automática ao término de qualquer pipeline
+-  Análise do status de conclusão (success/failure)
+-  Captura de contexto completo da execução
+-  Rastreamento de branch, commit e timestamp
+
+#### **Criação Automática de Issues**
+Gera tickets de alerta quando pipelines falham:
+-  Criação automática de issue no GitHub Issues
+-  Título descritivo com emoji de alerta (🚨)
+-  Corpo detalhado incluindo:
+- Nome do workflow que falhou
+- ID da execução para rastreamento
+- Branch e commit SHA
+- Timestamp da falha
+- Link direto para detalhes do workflow
+-  Labels automáticas para priorização:
+- `bug` - Indica bug de pipeline
+- `ci-failure` - Marca como falha de CI/CD
+- `urgent` - Prioridade alta para ação imediata
+-  Notificação visual com alertas para equipe
+
+#### **Registro de Métricas**
+Documenta todas as execuções com dados para análise:
+-  Tabela estruturada em Job Summary
+-  Registro de métricas incluindo:
+- Nome do workflow executado
+- Status de conclusão (success/failure)
+- Branch de origem
+- Número da tentativa de execução
+- Timestamp UTC da execução
+-  Armazenamento histórico para auditoria
+-  Facilita análise de tendências de falha
+
+**Fluxo Automático:**
+```
+Workflow Concluído
+  ↓
+Análise de Status
+  ├─ Failure? → Criar Issue + Labels + Detalhes
+  └─ Sempre → Registrar Métricas em Summary
+```
 
 ## Funcionalidades Implementadas
 
- **CRUD Completo**
+**CRUD Completo**
 - Criar, ler, atualizar e deletar livros
 - Suporte a categorias (Fantasia, Romance, Terror, Épico, etc.)
 
- **Interface Responsiva**
+**Interface Responsiva**
 - Bootstrap 5 para layout moderno
 - Formulários validados frontend + backend
 - Tabela com ações inline (editar/deletar)
 
- **Testes Abrangentes**
+**Testes Abrangentes**
 - JUnit 5 com testes unitários
 - jqwik para property-based testing (geração de dados randômicos)
 - Selenium WebDriver para E2E (headless Chrome)
 - Cobertura ≥90% via Jacoco
+- **Testes Pós-Deploy** que validam a aplicação após deployment
 
- **Segurança**
+**Segurança**
 - CodeQL para análise estática
 - DAST para testes dinâmicos
 - Validações de entrada em todas as camadas
+- Testes de segurança em staging/prod
 
- **DevOps**
-- 4 workflows GitHub Actions orchestrados
+**DevOps Avançado**
+- 5 workflows GitHub Actions orchestrados
 - Deploy automático em dev
-- Aprovações manuais para staging/prod
+- Aprovações manuais para prod
+- Sistema de alertas automáticos
+- Testes pós-deploy com Selenium
+- Monitoramento em tempo real
 - Relatórios de testes e cobertura
 
 ---
 
-##  Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 TP5-PB2/
 ├── src/
 │   ├── main/java/com/biblioteca/
-│   │   ├── app/               # Classe Main (BibliotecaWebApplication
+│   │   ├── app/               # Classe Main (BibliotecaWebApplication)
 │   │   ├── controller/        # Controladores Javalin
 │   │   ├── model/             # Modelos (Book, etc)
 │   │   │   └── enums          # Enums de User/Admin
@@ -195,11 +293,13 @@ TP5-PB2/
 │       └── UserServiceTest.java             
 ├── build.gradle          # Configuração Gradle (Groovy)
 ├── .github/workflows/         # Workflows CI/CD
-│   ├── gradle-ci.yml
-│   ├── codeQL.yml
-│   ├── dastScan.yml
-│   └── deployTests.yml
+│   ├── gradle-ci.yml          # Build paralelo + testes
+│   ├── codeQL.yml             # Análise estática
+│   ├── dastScan.yml           # Testes dinâmicos OWASP
+│   ├── deployTests.yml        # Deploy + Testes Pós-Deploy
+│   └── alert.yml              # Monitoramento e alertas
 ├── README.md
+├── MUDANCAS.md                # Documentação das melhorias implementadas
 └── gradlew / gradlew.bat      # Gradle Wrapper
 ```
 
@@ -229,5 +329,12 @@ app.start(8080);
 ./gradlew jacocoTestReport
 # Abra build/reports/jacoco/test/html/index.html e identifique linhas vermelhas
 ```
+
+### Pipeline Deploy falhando
+**Verificar:**
+1. Artefato foi gerado corretamente no step de Build
+2. Chrome está instalado no runner
+3. Aplicação inicia sem erros (`java -jar`)
+4. Testes Selenium conseguem acessar `http://localhost:7000`
 
 ---
